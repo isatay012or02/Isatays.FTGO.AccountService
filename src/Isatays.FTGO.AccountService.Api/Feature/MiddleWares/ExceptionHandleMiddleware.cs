@@ -1,4 +1,5 @@
 ﻿using Isatays.FTGO.AccountService.Api.Common.Exceptions;
+using Isatays.FTGO.AccountService.Api.Common.Extensions;
 using System.Net;
 
 namespace Isatays.FTGO.AccountService.Api.Feature.MiddleWares;

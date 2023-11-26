@@ -16,6 +16,10 @@ public static class WebApplicationBuilderExtensions
     {
         #region Logging
 
+        //Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
+        //builder.Logging.ClearProviders();
+        //builder.Logging.AddSerilog(Log.Logger);
+
         _ = builder.Host.UseSerilog((hostContext, loggerConfiguration) =>
         {
             var assembly = Assembly.GetEntryAssembly();
@@ -50,12 +54,12 @@ public static class WebApplicationBuilderExtensions
             c.SwaggerDoc("v1", new OpenApiInfo
             {
                 Version = "V1",
-                Title = $"CleanMinimalApi {ti.ToTitleCase(builder.Environment.EnvironmentName)} API",
-                Description = "An example API to show an implementation of .net 6's Minimal Api feature.",
+                Title = $"{ti.ToTitleCase(builder.Environment.EnvironmentName)} API",
+                Description = "An API to show an implementation of AccountService.",
                 Contact = new OpenApiContact
                 {
-                    Name = "Example Person",
-                    Email = "example@person.com"
+                    Name = "Isatay Abdrakhmanov",
+                    Email = "isaa012or02@gmail.com"
                 }
             });
             c.TagActionsBy(api => new[] { api.GroupName });
@@ -67,7 +71,7 @@ public static class WebApplicationBuilderExtensions
         #region Project Dependencies
 
         _ = builder.Services.ConfigureDatabaseConnection(builder.Configuration);
-        //_ = builder.Services.ConfigureDependencyInjection();
+        _ = builder.Services.ConfigureDependencyInjection();
 
         #endregion Project Dependencies
 

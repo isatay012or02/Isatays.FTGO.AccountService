@@ -3,14 +3,14 @@ using Isatays.FTGO.AccountService.Api.Feature.Extensions;
 using Isatays.FTGO.AccountService.Api.Feature.MiddleWares;
 using Serilog;
 
-var app = WebApplication.CreateBuilder(args).ConfigureBuilder().Build().ConfigureApp();
-
 try
 {
+    var app = WebApplication.CreateBuilder(args).ConfigureBuilder().Build().ConfigureApp();
+
     app.UseMiddleware<LoggingMiddleware>();
     app.UseMiddleware<ExceptionHandleMiddleware>();
 
-    app.MapHealthChecks("/healthcheck");
+    //app.MapHealthChecks("/healthcheck");
 
     app.ConfigureAccountEndpoints();
 

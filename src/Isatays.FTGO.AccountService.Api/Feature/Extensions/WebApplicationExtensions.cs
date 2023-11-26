@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Isatays.FTGO.AccountService.Api.Common.Extensions;
+using Serilog;
 using System.Globalization;
 
 namespace Isatays.FTGO.AccountService.Api.Feature.Extensions;
@@ -24,7 +25,7 @@ public static class WebApplicationExtensions
         var ti = CultureInfo.CurrentCulture.TextInfo;
 
         _ = app.UseSwagger();
-        _ = app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", $"CleanMinimalApi - {ti.ToTitleCase(app.Environment.EnvironmentName)} - V1"));
+        _ = app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", $"{ti.ToTitleCase(app.Environment.EnvironmentName)} - V1"));
 
         #endregion Swagger
 

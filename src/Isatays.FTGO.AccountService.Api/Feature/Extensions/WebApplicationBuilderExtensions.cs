@@ -49,9 +49,36 @@ public static class WebApplicationBuilderExtensions
         var ti = CultureInfo.CurrentCulture.TextInfo;
 
         _ = builder.Services.AddEndpointsApiExplorer();
-        _ = builder.Services.AddSwaggerGen(c =>
+        _ = builder.Services.AddSwaggerGen(options =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        },
+                        Scheme = "oauth2",
+                        Name = "Bearer",
+                        In = ParameterLocation.Header,
+                    },
+                    new List<string>()
+                }
+            });
+            
+            options.SwaggerDoc("v1", new OpenApiInfo
             {
                 Version = "V1",
                 Title = $"{ti.ToTitleCase(builder.Environment.EnvironmentName)} API",
@@ -62,8 +89,8 @@ public static class WebApplicationBuilderExtensions
                     Email = "isaa012or02@gmail.com"
                 }
             });
-            c.TagActionsBy(api => new[] { api.GroupName });
-            c.DocInclusionPredicate((name, api) => true);
+            options.TagActionsBy(api => new[] { api.GroupName });
+            options.DocInclusionPredicate((name, api) => true);
         });
 
         #endregion Swagger

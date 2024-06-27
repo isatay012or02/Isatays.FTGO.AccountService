@@ -5,6 +5,7 @@ using Isatays.FTGO.AccountService.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
 using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace Isatays.FTGO.AccountService.Api.Endpoints;
@@ -34,6 +35,7 @@ public static class AccountEndpoints
             .WithGroupName("Health");
     }
 
+    [Authorize(Roles = "Moderator")]
     private static async Task<IResult> AuthorizeCreditCard(IAccountService accountService, [FromBody] AuthorizeCreditCardDto request)
     {
         var result = await accountService.AuthorizeCreditCard(request.CreditNumber, request.ExpirationDate, request.CardCode);
@@ -41,6 +43,7 @@ public static class AccountEndpoints
         return Results.Ok(result.Value);
     }
 
+    [Authorize(Roles = "Moderator")]
     private static async Task<IResult> AddCreditCard(IAccountService accountService, [FromBody] AddCreditCardDto request)
     {
         var result = await accountService.AddCreditCard(request.CardNumber, request.ExpirationDate, request.CardCode);

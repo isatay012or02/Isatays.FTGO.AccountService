@@ -6,6 +6,8 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http.Json;
 using System.Reflection;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Isatays.FTGO.AccountService.Api.Feature.Extensions;
 
@@ -47,23 +49,45 @@ public static class WebApplicationBuilderExtensions
         #region Swagger
 
         var ti = CultureInfo.CurrentCulture.TextInfo;
-
+    
         _ = builder.Services.AddEndpointsApiExplorer();
-        _ = builder.Services.AddSwaggerGen(c =>
+        _ = builder.Services.AddSwaggerGen(options =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo
+            options.SwaggerDoc("v1", new OpenApiInfo
             {
                 Version = "V1",
                 Title = $"{ti.ToTitleCase(builder.Environment.EnvironmentName)} API",
-                Description = "An API to show an implementation of AccountService.",
+                Description = "An API to show an implementation of TokenService.",
                 Contact = new OpenApiContact
                 {
                     Name = "Isatay Abdrakhmanov",
                     Email = "isaa012or02@gmail.com"
                 }
             });
-            c.TagActionsBy(api => new[] { api.GroupName });
-            c.DocInclusionPredicate((name, api) => true);
+            options.TagActionsBy(api => new[] { api.GroupName });
+            options.DocInclusionPredicate((name, api) => true);
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = "Заголовок авторизации с использованием схемы Bearer. Пример: \"Bearer {token}\"",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
         });
 
         #endregion Swagger
@@ -76,5 +100,17 @@ public static class WebApplicationBuilderExtensions
         #endregion Project Dependencies
 
         return builder;
+    }
+    
+    /// <summary>
+    /// Расширяет <see cref="SwaggerGenOptions"/> добавлением комментариев из xml
+    /// </summary>
+    /// <param name="options"></param>
+    /// <param name="assembly"></param>
+    private static void AddXmlComment(this SwaggerGenOptions options, Assembly assembly)
+    {
+        var xmlFile = $"{assembly.GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        options.IncludeXmlComments(xmlPath);
     }
 }

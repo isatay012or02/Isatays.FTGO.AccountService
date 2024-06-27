@@ -4,6 +4,8 @@ using Isatays.FTGO.AccountService.Api.Models;
 using Isatays.FTGO.AccountService.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace Isatays.FTGO.AccountService.Api.Endpoints;
 
@@ -18,22 +20,28 @@ public static class AccountEndpoints
             .Produces<ApiError>(StatusCodes.Status404NotFound, contentType: MediaTypeNames.Application.Json)
             .Produces<ApiError>(StatusCodes.Status500InternalServerError, contentType: MediaTypeNames.Application.Json);
 
-        app.MapPost("api/add-credit-card", AddCreditCard)
+        app.MapPost("api/credit-card", AddCreditCard)
             .WithGroupName("Account")
             .Produces<Card>(StatusCodes.Status200OK, contentType: MediaTypeNames.Application.Json)
             .Produces<ApiError>(StatusCodes.Status400BadRequest, contentType: MediaTypeNames.Application.Json)
             .Produces<ApiError>(StatusCodes.Status404NotFound, contentType: MediaTypeNames.Application.Json)
             .Produces<ApiError>(StatusCodes.Status500InternalServerError, contentType: MediaTypeNames.Application.Json);
+        
+        app.MapHealthChecks("health", new HealthCheckOptions
+            {
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            })
+            .WithGroupName("Health");
     }
 
-    public static async Task<IResult> AuthorizeCreditCard(IAccountService accountService, [FromBody] AuthorizeCreditCardDto request)
+    private static async Task<IResult> AuthorizeCreditCard(IAccountService accountService, [FromBody] AuthorizeCreditCardDto request)
     {
         var result = await accountService.AuthorizeCreditCard(request.CreditNumber, request.ExpirationDate, request.CardCode);
 
         return Results.Ok(result.Value);
     }
 
-    public static async Task<IResult> AddCreditCard(IAccountService accountService, [FromBody] AddCreditCardDto request)
+    private static async Task<IResult> AddCreditCard(IAccountService accountService, [FromBody] AddCreditCardDto request)
     {
         var result = await accountService.AddCreditCard(request.CardNumber, request.ExpirationDate, request.CardCode);
 
